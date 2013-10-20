@@ -1,0 +1,6 @@
+version = "0.2"
+description = "Functorial constructors to provide string conversion and comparison functions for the standard collection types"
+requires = ""
+archive(byte) = "typeutil.cma"
+archive(native) = "typeutil.cmxa"
+
