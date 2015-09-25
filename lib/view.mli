@@ -34,7 +34,18 @@ type viewer = er
 (** String conversion. *)
 val toString : viewer -> string
 
+(** {3 Primitive viewers} *)
+
+(** empty viewer *)
+val empty : viewer
+
+(** composition (one afer another) *)
+val concat : viewer -> viewer -> viewer
+
 (** {3 Viewers for built-in types} *)
+
+(** [unit] viewer. *)
+val unit : unit -> viewer
 
 (** [string] viewer. *)
 val string : string -> viewer

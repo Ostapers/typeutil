@@ -32,7 +32,12 @@ let toString v =
   v b;
   Buffer.contents b
 
+let empty  b     = ()
+let concat x y b = x b; y b
+
 let string x b = Buffer.add_string b x
+
+let unit   _   = string "()"
 let int    x   = string (string_of_int x)
 let float  x   = string (string_of_float x)
 let bool   x   = string (string_of_bool x)

@@ -45,6 +45,9 @@ val raw : string -> viewer
 
 (** {3 Viewer constructors for build-in types} *)
 
+(** [unit] viewer. *)
+val unit : unit -> viewer
+
 (** [int] viewer. *)
 val int : int -> viewer
 
@@ -96,21 +99,69 @@ val tag : ?attrs:string -> string -> viewer -> viewer
 
 (** {3 Some conventional HTML tags. Optional argument [attrs] provides HTML tag attributes} *)
 
-(** *)
-val html : ?attrs:string -> viewer -> viewer
+val html  : ?attrs:string -> viewer -> viewer
 val title : ?attrs:string -> viewer -> viewer
-val body : ?attrs:string -> viewer -> viewer
-val ul : ?attrs:string -> viewer -> viewer
-val ol : ?attrs:string -> viewer -> viewer
-val li : ?attrs:string -> viewer -> viewer
-val b : ?attrs:string -> viewer -> viewer
-val i : ?attrs:string -> viewer -> viewer
+val body  : ?attrs:string -> viewer -> viewer
+val ul    : ?attrs:string -> viewer -> viewer
+val ol    : ?attrs:string -> viewer -> viewer
+val li    : ?attrs:string -> viewer -> viewer
+val b     : ?attrs:string -> viewer -> viewer
+val i     : ?attrs:string -> viewer -> viewer
 val table : ?attrs:string -> viewer -> viewer
-val tr : ?attrs:string -> viewer -> viewer
-val td : ?attrs:string -> viewer -> viewer
-val th : ?attrs:string -> viewer -> viewer
-val form : ?attrs:string -> viewer -> viewer
+val tr    : ?attrs:string -> viewer -> viewer
+val td    : ?attrs:string -> viewer -> viewer
+val th    : ?attrs:string -> viewer -> viewer
+val form  : ?attrs:string -> viewer -> viewer
 val input : ?attrs:string -> viewer -> viewer
+
+(** {3 Some conventional HTML inputs. Optional argument [attrs] provides HTML tag attributes} *)
+
+val checkbox : ?attrs:string -> viewer -> viewer 
+val button   : ?attrs:string -> viewer -> viewer 
+val text     : ?attrs:string -> viewer -> viewer 
+val textarea : ?attrs:string -> viewer -> viewer 
+val div      : ?attrs:string -> viewer -> viewer 
+
+val radio    : ?attrs:string -> (viewer * string * string) list -> viewer 
+val select   : ?attrs:string -> (viewer * string * string) list -> viewer
+
+(** {2 Multi-page wizard generator} *)
+
+module Wizard :
+  sig
+
+    (* {3 Type of page: each method adds a corresponding input control (in order of invocation)} *)
+    type page = < string : ?attrs:string -> string -> page;
+                  text   : ?attrs:string -> ?default:string -> string -> page;
+                  div    : ?attrs:string -> ?default:string -> string -> page;
+                  flag   : ?attrs:string -> string -> page;
+                  combo  : ?attrs:string -> string -> (viewer * string * string) list -> page;
+                  radio  : ?attrs:string -> string -> (viewer * string * string) list -> page;
+                  id     : string -> string;
+                >
+
+    (* {3 Wizard type: first add pages, then generate. Returns a pair: top-level function name to call, and javascript 
+          wizard code to embed}
+    *)
+    type t = < page : (page -> page) list -> page; generate : string * string >
+
+    val string : ?attrs:string -> string -> page -> page
+    val text   : ?attrs:string -> ?default:string -> string -> page -> page
+    val div    : ?attrs:string -> ?default:string -> string -> page -> page
+    val flag   : ?attrs:string -> string -> page -> page
+    val combo  : ?attrs:string -> string -> (viewer * string * string) list -> page -> page
+    val radio  : ?attrs:string -> string -> (viewer * string * string) list -> page -> page
+
+    (* {3 [create id target navigate] an empty wizard. "id" - some id, which distinguish this wizard from others,
+        "target" - a DOM element to embed the wizard to, "navigate" - the name of navigation function. Navigation 
+         function takes two arguments: a number of page and context object, which collects the information from
+         the wizard. This object binds input names, provided when these inputs were added to the page, to their
+         values. Navigation function returns -1, if the values, provided by the user, are incorrect, and the number
+         of the next page to show otherwize. For the last page it can invoke some action the wizard was designed to
+         provide a configuration for, and return the same number of page} *)
+    val create : ?attrs:string -> string -> string -> string -> t
+
+  end
 
 (** {2 Helper module to provide anchors to values} *)
 
